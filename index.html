@@ -91,11 +91,11 @@
             <div class="left-panel">
                 <div class="header">
                     <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 1 🎲</h1>
-                    <p class="subtitle">หมายเลข ละ 150 บาท </p>
+                    <p class="subtitle">เชื่อมต่อฐานข้อมูล Google Sheets (Grid A)</p>
                 </div>
                 <div class="numbers-grid" id="numbersGridA"></div>
                 <div class="name-assignment">
-                    <div class="selected-title">👤 ระบุ รหัสพนักงาน และ ชื่อ-สกุล เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
+                    <div class="selected-title">👤 กำหนดชื่อให้ตัวเลข (กำหนดแล้วลบไม่ได้)</div>
                     <div class="name-input-section">
                         <input type="text" class="name-input" id="nameInputA" placeholder="ใส่ชื่อ..." maxlength="30">
                         <button class="btn-assign" id="assignBtnA" disabled>📝 ยืนยันการจอง</button>
@@ -129,11 +129,11 @@
             <div class="left-panel">
                 <div class="header">
                     <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 2 🎲</h1>
-                    <p class="subtitle">หมายเลข ละ 150 บาท  </p>
+                    <p class="subtitle">เชื่อมต่อฐานข้อมูล Google Sheets (Grid B)</p>
                 </div>
                 <div class="numbers-grid" id="numbersGridB"></div>
                 <div class="name-assignment">
-                    <div class="selected-title">👤 ระบุ รหัสพนักงาน และ ชื่อ-สกุล เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
+                    <div class="selected-title">👤 กำหนดชื่อให้ตัวเลข (กำหนดแล้วลบไม่ได้)</div>
                     <div class="name-input-section">
                         <input type="text" class="name-input" id="nameInputB" placeholder="ใส่ชื่อ..." maxlength="30">
                         <button class="btn-assign" id="assignBtnB" disabled>📝 ยืนยันการจอง</button>
@@ -213,14 +213,15 @@
             const { assignments, selectedNumbers } = state[gridId];
             grid.innerHTML = '';
             for (let i = 0; i <= 99; i++) {
+                const numberStr = String(i).padStart(2, '0');
                 const numberCard = document.createElement('div');
                 numberCard.className = 'number-card';
-                numberCard.textContent = i.toString().padStart(2, '0');
-                if (assignments.has(i)) {
+                numberCard.textContent = numberStr;
+                if (assignments.has(numberStr)) {
                     numberCard.classList.add('assigned');
                 } else {
-                    if (selectedNumbers.has(i)) numberCard.classList.add('selected');
-                    numberCard.onclick = () => toggleNumber(i, gridId);
+                    if (selectedNumbers.has(numberStr)) numberCard.classList.add('selected');
+                    numberCard.onclick = () => toggleNumber(numberStr, gridId);
                 }
                 grid.appendChild(numberCard);
             }
@@ -233,10 +234,10 @@
                 list.innerHTML = '<span style="color: #9ca3af; font-style: italic;">กำลังโหลดหรือยังไม่มีการจอง...</span>';
                 return;
             };
-            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0] - b[0]);
+            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
             list.innerHTML = sorted.map(([num, name]) => `
                 <div class="assignment-item">
-                    <span class="assignment-number">${num.toString().padStart(2, '0')}</span>
+                    <span class="assignment-number">${num}</span>
                     <span class="assignment-name">${name}</span>
                 </div>`).join('');
         }
@@ -246,15 +247,15 @@
             updateAssignmentsDisplay(gridId);
         }
 
-        function toggleNumber(number, gridId) {
+        function toggleNumber(numberStr, gridId) {
             if (state[gridId].isLoading) return;
             const { selectedNumbers } = state[gridId];
-            if (selectedNumbers.has(number)) {
-                selectedNumbers.delete(number);
+            if (selectedNumbers.has(numberStr)) {
+                selectedNumbers.delete(numberStr);
             } else {
-                selectedNumbers.add(number);
+                selectedNumbers.add(numberStr);
             }
-            renderNumberGrid(gridId); // Re-render to show selection
+            renderNumberGrid(gridId);
             updateAssignButton(gridId);
         }
 
@@ -322,30 +323,44 @@
         function randomSelect(gridId) {
             if(state[gridId].isLoading) return;
             const { assignments, selectedNumbers } = state[gridId];
-            const available = Array.from({length: 100}, (_, i) => i).filter(i => !assignments.has(i));
-            if (available.length === 0) return alert(`ทุกหมายเลขในตาราง ${gridId} ถูกจองแล้ว`);
+            
+            // สร้าง array ของหมายเลขทั้งหมดที่เป็น string ('00' ถึง '99')
+            const allNumbers = Array.from({length: 100}, (_, i) => String(i).padStart(2, '0'));
+            
+            // กรองเอาเฉพาะหมายเลขที่ยังว่าง (ไม่มีใน assignments)
+            const available = allNumbers.filter(num => !assignments.has(num));
+            
+            if (available.length === 0) {
+                return alert(`ทุกหมายเลขในตาราง ${gridId} ถูกจองแล้ว`);
+            }
+            
             const randomNum = available[Math.floor(Math.random() * available.length)];
+            
+            // [แก้ไข!] ล้างการเลือกเก่าออกก่อน แล้วเพิ่มเฉพาะอันที่สุ่มได้ใหม่
             selectedNumbers.clear();
             selectedNumbers.add(randomNum);
+            
             renderNumberGrid(gridId);
             updateAssignButton(gridId);
         }
 
         async function checkWinner(gridId) {
             const { winInput, winMessage } = state[gridId].elements;
-            const { assignments } = state[gridId];
-            const numStr = winInput.value.trim();
-            if (!/^\d{1,2}$/.test(numStr)) {
+            const numStr = winInput.value.trim().padStart(2, '0');
+
+            if (!/^\d{1,2}$/.test(winInput.value.trim())) {
                 winMessage.innerHTML = '<span style="color: red;">กรุณาใส่หมายเลข (0-99)</span>';
                 return;
             }
-            const winNum = parseInt(numStr, 10);
-            await loadData(gridId);
-            if (!assignments.has(winNum)) {
-                winMessage.innerHTML = `หมายเลข <b>${winNum.toString().padStart(2,'0')}</b> ไม่มีผู้จอง`;
+            
+            await loadData(gridId); // โหลดข้อมูลล่าสุดเสมอ
+            const { assignments } = state[gridId];
+
+            if (!assignments.has(numStr)) {
+                winMessage.innerHTML = `หมายเลข <b>${numStr}</b> ไม่มีผู้จอง`;
             } else {
-                const winnerName = assignments.get(winNum);
-                winMessage.innerHTML = `ยินดีด้วย! ผู้โชคดีคือ <b>${winnerName}</b> (หมายเลข <b>${winNum.toString().padStart(2,'0')}</b>)`;
+                const winnerName = assignments.get(numStr);
+                winMessage.innerHTML = `ยินดีด้วย! ผู้โชคดีคือ <b>${winnerName}</b> (หมายเลข <b>${numStr}</b>)`;
             }
         }
         
@@ -353,8 +368,8 @@
             const { assignments } = state[gridId];
             if (assignments.size === 0) return alert(`ไม่มีข้อมูลในตาราง ${gridId} ให้ส่งออก`);
             let csv = '\uFEFFหมายเลข,ชื่อ\n';
-            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0] - b[0]);
-            sorted.forEach(([num, name]) => { csv += `${num.toString().padStart(2, '0')},"${name}"\n`; });
+            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+            sorted.forEach(([num, name]) => { csv += `${num},"${name}"\n`; });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
