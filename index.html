@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>กระดานจับฉลาก Real-time (2 รางวัล)</title>
+    <title>กระดานจับฉลาก Real-time</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
         
@@ -16,7 +16,7 @@
         }
         .main-container {
             display: flex; flex-wrap: wrap; gap: 25px;
-            width: 100%; max-width: 1800px;
+            width: 100%; max-width: 1200px; /* Adjusted max-width for a single item */
             justify-content: center;
         }
         .lottery-instance {
@@ -78,86 +78,45 @@
         .footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e5e7eb; }
         .instructions { font-size: 12px; color: #6b7280; line-height: 1.5; }
 
-        @media (max-width: 1800px) {
-            .main-container { flex-direction: column; align-items: center; }
-        }
     </style>
 </head>
 <body>
     <div class="main-container">
 
-        <!-- ============== INSTANCE A ============== -->
+        <!-- ============== LOTTERY INSTANCE ============== -->
         <div class="lottery-instance">
             <div class="left-panel">
                 <div class="header">
-                    <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 1 🎲</h1>
-                    <p class="subtitle">หมายเลข ล่ะ  150 บาท</p>
+                    <h1 class="title">🎲 กระดานจับฉลาก 🎲</h1>
+                    <p class="subtitle">หมายเลขล่ะ 150 บาท</p>
                 </div>
-                <div class="numbers-grid" id="numbersGridA"></div>
+                <div class="numbers-grid" id="numbersGrid"></div>
                 <div class="name-assignment">
                     <div class="selected-title">👤 ระบุรหัส พนักงาน-ชื่อ เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
                     <div class="name-input-section">
-                        <input type="text" class="name-input" id="nameInputA" placeholder="ใส่ชื่อ..." maxlength="30">
-                        <button class="btn-assign" id="assignBtnA" disabled>📝 ยืนยันการจอง</button>
+                        <input type="text" class="name-input" id="nameInput" placeholder="ใส่ชื่อ..." maxlength="30">
+                        <button class="btn-assign" id="assignBtn" disabled>📝 ยืนยันการจอง</button>
                     </div>
-                    <div class="assignments-list" id="assignmentsListA"></div>
+                    <div class="assignments-list" id="assignmentsList"></div>
                 </div>
                 <div class="controls">
-                    <button class="btn btn-random" id="randomBtnA">🎯 สุ่มเลือกเลขว่าง</button>
-                    <button class="btn btn-export" id="exportBtnA">📊 ส่งออก Excel</button>
+                    <button class="btn btn-random" id="randomBtn">🎯 สุ่มเลือกเลขว่าง</button>
+                    <button class="btn btn-export" id="exportBtn">📊 ส่งออก Excel</button>
                 </div>
             </div>
             <div class="right-panel">
                 <div class="product-display">
-                    <img src="https://lh3.googleusercontent.com/d/1uJfh__1Uvqf-lOo7gSyujSMBMEPgMoli" alt="รูปรางวัลชิ้นที่ 1">
-                    <h2 class="product-title">🎁 รางวัลสำหรับผู้โชคดี (ชิ้นที่ 1)</h2>
-                    <p class="product-description">รายละเอียดของรางวัลชิ้นที่ 1</p>
+                    <img src="https://lh3.googleusercontent.com/d/1uJfh__1Uvqf-lOo7gSyujSMBMEPgMoli" alt="รูปรางวัล">
+                    <h2 class="product-title">🎁 รางวัลสำหรับผู้โชคดี</h2>
+                    <p class="product-description">รายละเอียดของรางวัล</p>
                 </div>
                 <div class="conditions-panel">
-                    <h3 class="panel-title">⚙️ ระบบตรวจสอบรางวัล (ชิ้นที่ 1)</h3>
+                    <h3 class="panel-title">⚙️ ระบบตรวจสอบรางวัล</h3>
                     <div class="result-input-group">
-                        <input type="number" class="result-input" id="winningNumberInputA" placeholder="กรอกเลขที่ออก" min="0" max="99">
-                        <button class="btn-check" id="checkBtnA">ตรวจสอบผล</button>
+                        <input type="number" class="result-input" id="winningNumberInput" placeholder="กรอกเลขที่ออก" min="0" max="99">
+                        <button class="btn-check" id="checkBtn">ตรวจสอบผล</button>
                     </div>
-                    <div class="result-message" id="resultMessageA">ผลการออกรางวัลสำหรับรางวัลชิ้นที่ 1</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============== INSTANCE B ============== -->
-        <div class="lottery-instance">
-            <div class="left-panel">
-                <div class="header">
-                    <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 2 🎲</h1>
-                    <p class="subtitle">หมายเลข ล่ะ  150 บาท </p>
-                </div>
-                <div class="numbers-grid" id="numbersGridB"></div>
-                <div class="name-assignment">
-                    <div class="selected-title">👤 ระบุรหัส พนักงาน-ชื่อ เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
-                    <div class="name-input-section">
-                        <input type="text" class="name-input" id="nameInputB" placeholder="ใส่ชื่อ..." maxlength="30">
-                        <button class="btn-assign" id="assignBtnB" disabled>📝 ยืนยันการจอง</button>
-                    </div>
-                    <div class="assignments-list" id="assignmentsListB"></div>
-                </div>
-                <div class="controls">
-                    <button class="btn btn-random" id="randomBtnB">🎯 สุ่มเลือกเลขว่าง</button>
-                    <button class="btn btn-export" id="exportBtnB">📊 ส่งออก Excel</button>
-                </div>
-            </div>
-            <div class="right-panel">
-                <div class="product-display">
-                    <img src="https://lh3.googleusercontent.com/d/1THkm1Mj7AZkm5SuAWVqLODbFgc9rhu1D" alt="รูปรางวัลชิ้นที่ 2">
-                    <h2 class="product-title">🎁 รางวัลสำหรับผู้โชคดี (ชิ้นที่ 2)</h2>
-                    <p class="product-description">รายละเอียดของรางวัลชิ้นที่ 2</p>
-                </div>
-                <div class="conditions-panel">
-                    <h3 class="panel-title">⚙️ ระบบตรวจสอบรางวัล (ชิ้นที่ 2)</h3>
-                    <div class="result-input-group">
-                        <input type="number" class="result-input" id="winningNumberInputB" placeholder="กรอกเลขที่ออก" min="0" max="99">
-                        <button class="btn-check" id="checkBtnB">ตรวจสอบผล</button>
-                    </div>
-                    <div class="result-message" id="resultMessageB">ผลการออกรางวัลสำหรับรางวัลชิ้นที่ 2</div>
+                    <div class="result-message" id="resultMessage">ผลการออกรางวัล</div>
                 </div>
             </div>
         </div>
@@ -167,74 +126,55 @@
     <script>
         // =================================================================
         // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziAiOR8LA54Ce2w02LeqTU6OdyE0eyK2udfMDr33k9Xnk5G_FP6Bg5v7xYQ1ea-wTn-w/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziAiOR8LA54Ce2w02LeqTU6OdyE0eyK2udfMDr33k9Xnk5G_FP6Bg5v7xYQ1ea-wTn-w/exec";
+        const GRID_ID = 'A'; // ระบุ ID ของกระดานนี้
         // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
         // =================================================================
 
-        // --- State Management for both grids ---
+        // --- State Management ---
         const state = {
-            A: {
-                selectedNumbers: new Set(),
-                assignments: new Map(),
-                isLoading: false,
-                elements: {
-                    grid: document.getElementById('numbersGridA'),
-                    list: document.getElementById('assignmentsListA'),
-                    input: document.getElementById('nameInputA'),
-                    assignBtn: document.getElementById('assignBtnA'),
-                    randomBtn: document.getElementById('randomBtnA'),
-                    exportBtn: document.getElementById('exportBtnA'),
-                    winInput: document.getElementById('winningNumberInputA'),
-                    checkBtn: document.getElementById('checkBtnA'),
-                    winMessage: document.getElementById('resultMessageA')
-                }
-            },
-            B: {
-                selectedNumbers: new Set(),
-                assignments: new Map(),
-                isLoading: false,
-                elements: {
-                    grid: document.getElementById('numbersGridB'),
-                    list: document.getElementById('assignmentsListB'),
-                    input: document.getElementById('nameInputB'),
-                    assignBtn: document.getElementById('assignBtnB'),
-                    randomBtn: document.getElementById('randomBtnB'),
-                    exportBtn: document.getElementById('exportBtnB'),
-                    winInput: document.getElementById('winningNumberInputB'),
-                    checkBtn: document.getElementById('checkBtnB'),
-                    winMessage: document.getElementById('resultMessageB')
-                }
+            selectedNumbers: new Set(),
+            assignments: new Map(),
+            isLoading: false,
+            elements: {
+                grid: document.getElementById('numbersGrid'),
+                list: document.getElementById('assignmentsList'),
+                input: document.getElementById('nameInput'),
+                assignBtn: document.getElementById('assignBtn'),
+                randomBtn: document.getElementById('randomBtn'),
+                exportBtn: document.getElementById('exportBtn'),
+                winInput: document.getElementById('winningNumberInput'),
+                checkBtn: document.getElementById('checkBtn'),
+                winMessage: document.getElementById('resultMessage')
             }
         };
 
         // --- Reusable Functions ---
-        function renderNumberGrid(gridId) {
-            const { grid } = state[gridId].elements;
-            const { assignments, selectedNumbers } = state[gridId];
+        function renderNumberGrid() {
+            const { grid } = state.elements;
             grid.innerHTML = '';
             for (let i = 0; i <= 99; i++) {
                 const numberStr = String(i).padStart(2, '0');
                 const numberCard = document.createElement('div');
                 numberCard.className = 'number-card';
                 numberCard.textContent = numberStr;
-                if (assignments.has(numberStr)) {
+                if (state.assignments.has(numberStr)) {
                     numberCard.classList.add('assigned');
                 } else {
-                    if (selectedNumbers.has(numberStr)) numberCard.classList.add('selected');
-                    numberCard.onclick = () => toggleNumber(numberStr, gridId);
+                    if (state.selectedNumbers.has(numberStr)) numberCard.classList.add('selected');
+                    numberCard.onclick = () => toggleNumber(numberStr);
                 }
                 grid.appendChild(numberCard);
             }
         }
 
-        function updateAssignmentsDisplay(gridId) {
-            const { list } = state[gridId].elements;
-            const { assignments } = state[gridId];
-            if (assignments.size === 0) {
+        function updateAssignmentsDisplay() {
+            const { list } = state.elements;
+            if (state.assignments.size === 0) {
                 list.innerHTML = '<span style="color: #9ca3af; font-style: italic;">กำลังโหลดหรือยังไม่มีการจอง...</span>';
                 return;
             };
-            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+            const sorted = Array.from(state.assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
             list.innerHTML = sorted.map(([num, name]) => `
                 <div class="assignment-item">
                     <span class="assignment-number">${num}</span>
@@ -242,61 +182,58 @@
                 </div>`).join('');
         }
 
-        function updateUI(gridId) {
-            renderNumberGrid(gridId);
-            updateAssignmentsDisplay(gridId);
+        function updateUI() {
+            renderNumberGrid();
+            updateAssignmentsDisplay();
         }
 
-        function toggleNumber(numberStr, gridId) {
-            if (state[gridId].isLoading) return;
-            const { selectedNumbers } = state[gridId];
-            if (selectedNumbers.has(numberStr)) {
-                selectedNumbers.delete(numberStr);
+        function toggleNumber(numberStr) {
+            if (state.isLoading) return;
+            if (state.selectedNumbers.has(numberStr)) {
+                state.selectedNumbers.delete(numberStr);
             } else {
-                selectedNumbers.add(numberStr);
+                state.selectedNumbers.add(numberStr);
             }
-            renderNumberGrid(gridId);
-            updateAssignButton(gridId);
+            renderNumberGrid();
+            updateAssignButton();
         }
 
-        function updateAssignButton(gridId) {
-            const { input, assignBtn } = state[gridId].elements;
-            const { selectedNumbers, isLoading } = state[gridId];
-            assignBtn.disabled = !(selectedNumbers.size > 0 && input.value.trim().length > 0) || isLoading;
+        function updateAssignButton() {
+            const { input, assignBtn } = state.elements;
+            assignBtn.disabled = !(state.selectedNumbers.size > 0 && input.value.trim().length > 0) || state.isLoading;
         }
 
         // --- Data Functions (API Calls) ---
-        async function loadData(gridId) {
-            if (state[gridId].isLoading) return;
-            state[gridId].isLoading = true;
-            updateAssignButton(gridId);
+        async function loadData() {
+            if (state.isLoading) return;
+            state.isLoading = true;
+            updateAssignButton();
             try {
-                const response = await fetch(`${SCRIPT_URL}?grid=${gridId}`);
+                const response = await fetch(`${SCRIPT_URL}?grid=${GRID_ID}`);
                 if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
                 const data = await response.json();
-                state[gridId].assignments = new Map(data);
+                state.assignments = new Map(data);
             } catch (error) {
-                console.error(`Failed to load data for Grid ${gridId}:`, error);
-                alert(`ไม่สามารถเชื่อมต่อฐานข้อมูลสำหรับตาราง ${gridId}`);
+                console.error('Failed to load data:', error);
+                alert('ไม่สามารถเชื่อมต่อฐานข้อมูลได้');
             } finally {
-                state[gridId].isLoading = false;
-                updateUI(gridId);
-                updateAssignButton(gridId);
+                state.isLoading = false;
+                updateUI();
+                updateAssignButton();
             }
         }
 
-        async function assignName(gridId) {
-            const { input, assignBtn } = state[gridId].elements;
-            const { selectedNumbers } = state[gridId];
+        async function assignName() {
+            const { input, assignBtn } = state.elements;
             const name = input.value.trim();
-            if (state[gridId].isLoading || !name || selectedNumbers.size === 0) return;
+            if (state.isLoading || !name || state.selectedNumbers.size === 0) return;
 
-            state[gridId].isLoading = true;
+            state.isLoading = true;
             assignBtn.disabled = true;
             assignBtn.textContent = "กำลังบันทึก...";
             
-            const assignmentsToSend = Array.from(selectedNumbers).map(num => ({ number: num, name: name }));
-            const postData = { grid: gridId, assignments: assignmentsToSend };
+            const assignmentsToSend = Array.from(state.selectedNumbers).map(num => ({ number: num, name: name }));
+            const postData = { grid: GRID_ID, assignments: assignmentsToSend };
             const formData = new FormData();
             formData.append('data', JSON.stringify(postData));
 
@@ -304,48 +241,43 @@
                 const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
                 if (!response.ok) throw new Error(`Failed to save data: ${response.statusText}`);
                 const result = await response.json();
-                console.log(`Server response for Grid ${gridId}:`, result);
-                alert(`ส่งคำขอจองสำหรับตาราง ${gridId} แล้ว!`);
+                console.log('Server response:', result);
+                alert('ส่งคำขอจองแล้ว!');
             } catch (error) {
-                console.error(`Failed to save data for Grid ${gridId}:`, error);
-                alert(`เกิดข้อผิดพลาดในการจองข้อมูลสำหรับตาราง ${gridId}`);
+                console.error('Failed to save data:', error);
+                alert('เกิดข้อผิดพลาดในการจองข้อมูล');
             }
 
-            selectedNumbers.clear();
+            state.selectedNumbers.clear();
             input.value = '';
             assignBtn.textContent = "📝 ยืนยันการจอง";
-            state[gridId].isLoading = false;
-            updateAssignButton(gridId);
-            setTimeout(() => loadData(gridId), 2000);
+            state.isLoading = false;
+            updateAssignButton();
+            setTimeout(loadData, 2000);
         }
 
         // --- Specific Actions ---
-        function randomSelect(gridId) {
-            if(state[gridId].isLoading) return;
-            const { assignments, selectedNumbers } = state[gridId];
+        function randomSelect() {
+            if(state.isLoading) return;
             
-            // สร้าง array ของหมายเลขทั้งหมดที่เป็น string ('00' ถึง '99')
             const allNumbers = Array.from({length: 100}, (_, i) => String(i).padStart(2, '0'));
-            
-            // กรองเอาเฉพาะหมายเลขที่ยังว่าง (ไม่มีใน assignments)
-            const available = allNumbers.filter(num => !assignments.has(num));
+            const available = allNumbers.filter(num => !state.assignments.has(num));
             
             if (available.length === 0) {
-                return alert(`ทุกหมายเลขในตาราง ${gridId} ถูกจองแล้ว`);
+                return alert('ทุกหมายเลขถูกจองแล้ว');
             }
             
             const randomNum = available[Math.floor(Math.random() * available.length)];
             
-            // [แก้ไข!] ล้างการเลือกเก่าออกก่อน แล้วเพิ่มเฉพาะอันที่สุ่มได้ใหม่
-            selectedNumbers.clear();
-            selectedNumbers.add(randomNum);
+            state.selectedNumbers.clear();
+            state.selectedNumbers.add(randomNum);
             
-            renderNumberGrid(gridId);
-            updateAssignButton(gridId);
+            renderNumberGrid();
+            updateAssignButton();
         }
 
-        async function checkWinner(gridId) {
-            const { winInput, winMessage } = state[gridId].elements;
+        async function checkWinner() {
+            const { winInput, winMessage } = state.elements;
             const numStr = winInput.value.trim().padStart(2, '0');
 
             if (!/^\d{1,2}$/.test(winInput.value.trim())) {
@@ -353,51 +285,43 @@
                 return;
             }
             
-            await loadData(gridId); // โหลดข้อมูลล่าสุดเสมอ
-            const { assignments } = state[gridId];
+            await loadData(); // โหลดข้อมูลล่าสุดเสมอ
 
-            if (!assignments.has(numStr)) {
+            if (!state.assignments.has(numStr)) {
                 winMessage.innerHTML = `หมายเลข <b>${numStr}</b> ไม่มีผู้จอง`;
             } else {
-                const winnerName = assignments.get(numStr);
+                const winnerName = state.assignments.get(numStr);
                 winMessage.innerHTML = `ยินดีด้วย! ผู้โชคดีคือ <b>${winnerName}</b> (หมายเลข <b>${numStr}</b>)`;
             }
         }
         
-        function exportToExcel(gridId) {
-            const { assignments } = state[gridId];
-            if (assignments.size === 0) return alert(`ไม่มีข้อมูลในตาราง ${gridId} ให้ส่งออก`);
+        function exportToExcel() {
+            if (state.assignments.size === 0) return alert('ไม่มีข้อมูลให้ส่งออก');
             let csv = '\uFEFFหมายเลข,ชื่อ\n';
-            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+            const sorted = Array.from(state.assignments.entries()).sort((a, b) => a[0].localeCompare(b[0]));
             sorted.forEach(([num, name]) => { csv += `${num},"${name}"\n`; });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `lottery_assignments_grid_${gridId}.csv`;
+            link.download = `lottery_assignments_grid_${GRID_ID}.csv`;
             link.click();
             URL.revokeObjectURL(link.href);
         }
 
         // --- Initialize ---
         document.addEventListener('DOMContentLoaded', () => {
-            ['A', 'B'].forEach(gridId => {
-                const { elements } = state[gridId];
-                updateUI(gridId);
-                loadData(gridId);
-                
-                elements.input.addEventListener('input', () => updateAssignButton(gridId));
-                elements.assignBtn.addEventListener('click', () => assignName(gridId));
-                elements.randomBtn.addEventListener('click', () => randomSelect(gridId));
-                elements.exportBtn.addEventListener('click', () => exportToExcel(gridId));
-                elements.checkBtn.addEventListener('click', () => checkWinner(gridId));
-            });
+            const { elements } = state;
+            updateUI();
+            loadData();
+            
+            elements.input.addEventListener('input', updateAssignButton);
+            elements.assignBtn.addEventListener('click', assignName);
+            elements.randomBtn.addEventListener('click', randomSelect);
+            elements.exportBtn.addEventListener('click', exportToExcel);
+            elements.checkBtn.addEventListener('click', checkWinner);
 
-            setInterval(() => {
-                loadData('A');
-                loadData('B');
-            }, 20000); // Poll every 20 seconds
+            setInterval(loadData, 20000); // Poll every 20 seconds
         });
     </script>
 </body>
 </html>
-
