@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กระดานจับฉลาก Real-time (2 รางวัล)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #1d2b64 0%, #0c0c0c 100%);
+            min-height: 100vh; padding: 20px; display: flex;
+            justify-content: center; align-items: flex-start;
+        }
+        .main-container {
+            display: flex; flex-wrap: wrap; gap: 25px;
+            width: 100%; max-width: 1800px;
+            justify-content: center;
+        }
+        .lottery-instance {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .left-panel {
+            flex: 1.2; min-width: 450px; background: white; padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 8px;
+            position: relative; overflow: hidden; height: fit-content;
+        }
+        .right-panel {
+            flex: 1; min-width: 400px; display: flex;
+            flex-direction: column; gap: 20px;
+        }
+        .product-display, .conditions-panel {
+            background: white; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 8px;
+        }
+        .product-display img { width: 100%; height: auto; border-radius: 6px; margin-bottom: 15px; }
+        .product-title { font-size: 24px; font-weight: 700; color: #1e1b4b; margin-bottom: 8px; }
+        .product-description { font-size: 15px; color: #4b5563; line-height: 1.6; }
+        .conditions-panel .panel-title { font-size: 18px; font-weight: 700; color: #1e1b4b; margin-bottom: 15px; border-bottom: 2px solid #6366f1; padding-bottom: 10px; }
+        .result-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .result-input { flex: 1; padding: 10px; border: 2px solid #d1d5db; border-radius: 6px; font-size: 16px; text-align: center; font-family: 'Sarabun', sans-serif; }
+        .result-input:focus { outline: none; border-color: #4f46e5; }
+        .btn-check { background: #10b981; color: white; border: none; padding: 0 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.3s ease; }
+        .btn-check:hover { background: #059669; }
+        .result-message { background: #f3f4f6; border: 1px dashed #d1d5db; border-radius: 6px; padding: 15px; min-height: 100px; font-size: 15px; line-height: 1.7; color: #374151; }
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 3px solid #4f46e5; padding-bottom: 10px; }
+        .title { font-size: 26px; font-weight: 700; color: #1e1b4b; }
+        .subtitle { font-size: 14px; color: #6366f1; font-weight: 600; }
+        .numbers-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; margin-bottom: 12px; }
+        .number-card { aspect-ratio: 1; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #374151; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; }
+        .number-card:hover:not(.assigned) { transform: scale(1.1); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); border-color: #6366f1; z-index: 10; }
+        .number-card.selected { background: linear-gradient(145deg, #4f46e5, #7c3aed); color: white; border-color: #4338ca; transform: scale(0.95); }
+        .number-card.assigned { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; border-color: #d1d5db; }
+        .name-assignment { background: #f9fafb; border-radius: 6px; padding: 10px; margin-top: 10px; border: 1px solid #e5e7eb; }
+        .selected-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+        .name-input-section { display: flex; gap: 8px; margin-bottom: 10px; }
+        .name-input { flex: 1; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-family: 'Sarabun', sans-serif; }
+        .name-input:focus { outline: none; border-color: #4f46e5; }
+        .btn-assign { background: #8b5cf6; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-assign:hover:not(:disabled) { background: #7c3aed; }
+        .btn-assign:disabled { background: #9ca3af; cursor: not-allowed; }
+        .assignments-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
+        .assignment-item { background: white; border: 1px solid #e5e7eb; border-radius: 4px; padding: 8px; display: flex; justify-content: flex-start; align-items: center; gap: 10px; }
+        .assignment-number { background: #4f46e5; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .assignment-name { font-weight: 600; color: #374151; }
+        .controls { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-random { background: #10b981; color: white; }
+        .btn-export { background: #f59e0b; color: white; }
+        .footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #e5e7eb; }
+        .instructions { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+        @media (max-width: 1800px) {
+            .main-container { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+
+        <!-- ============== INSTANCE A ============== -->
+        <div class="lottery-instance">
+            <div class="left-panel">
+                <div class="header">
+                    <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 1 🎲</h1>
+                    <p class="subtitle">หมายเลข ละ 150 บาท *** 1 คน สามารถซื้อได้ 1 หมายเลข ต่อ ชิ้น เท่านั้น </p>
+                </div>
+                <div class="numbers-grid" id="numbersGridA"></div>
+                <div class="name-assignment">
+                    <div class="selected-title">👤 ระบุ รหัสพนักงาน และ ชื่อ-สกุล เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
+                    <div class="name-input-section">
+                        <input type="text" class="name-input" id="nameInputA" placeholder="ใส่ชื่อ..." maxlength="30">
+                        <button class="btn-assign" id="assignBtnA" disabled>📝 ยืนยันการจอง</button>
+                    </div>
+                    <div class="assignments-list" id="assignmentsListA"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-random" id="randomBtnA">🎯 สุ่มเลือกเลขว่าง</button>
+                    <button class="btn btn-export" id="exportBtnA">📊 ส่งออก Excel</button>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="product-display">
+                    <img src="https://lh3.googleusercontent.com/d/1uJfh__1Uvqf-lOo7gSyujSMBMEPgMoli" alt="รูปรางวัลชิ้นที่ 1">
+                    <h2 class="product-title">🎁 รางวัลสำหรับผู้โชคดี (ชิ้นที่ 1)</h2>
+                    <p class="product-description">รายละเอียดของรางวัลชิ้นที่ 1</p>
+                </div>
+                <div class="conditions-panel">
+                    <h3 class="panel-title">⚙️ ระบบตรวจสอบรางวัล (ชิ้นที่ 1)</h3>
+                    <div class="result-input-group">
+                        <input type="number" class="result-input" id="winningNumberInputA" placeholder="กรอกเลขที่ออก" min="0" max="99">
+                        <button class="btn-check" id="checkBtnA">ตรวจสอบผล</button>
+                    </div>
+                    <div class="result-message" id="resultMessageA">ผลการออกรางวัลสำหรับรางวัลชิ้นที่ 1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============== INSTANCE B ============== -->
+        <div class="lottery-instance">
+            <div class="left-panel">
+                <div class="header">
+                    <h1 class="title">🎲 กระดานรางวัลชิ้นที่ 2 🎲</h1>
+                    <p class="subtitle">หมายเลข ละ 150 บาท *** 1 คน สามารถซื้อได้ 1 หมายเลข ต่อ ชิ้น เท่านั้น </p>
+                </div>
+                <div class="numbers-grid" id="numbersGridB"></div>
+                <div class="name-assignment">
+                    <div class="selected-title">👤 ระบุ รหัสพนักงาน และ ชื่อ-สกุล เช่น 5223-ยืนยง (กำหนดแล้วลบไม่ได้)</div>
+                    <div class="name-input-section">
+                        <input type="text" class="name-input" id="nameInputB" placeholder="ใส่ชื่อ..." maxlength="30">
+                        <button class="btn-assign" id="assignBtnB" disabled>📝 ยืนยันการจอง</button>
+                    </div>
+                    <div class="assignments-list" id="assignmentsListB"></div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-random" id="randomBtnB">🎯 สุ่มเลือกเลขว่าง</button>
+                    <button class="btn btn-export" id="exportBtnB">📊 ส่งออก Excel</button>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="product-display">
+                    <img src="https://lh3.googleusercontent.com/d/1THkm1Mj7AZkm5SuAWVqLODbFgc9rhu1D" alt="รูปรางวัลชิ้นที่ 2">
+                    <h2 class="product-title">🎁 รางวัลสำหรับผู้โชคดี (ชิ้นที่ 2)</h2>
+                    <p class="product-description">รายละเอียดของรางวัลชิ้นที่ 2</p>
+                </div>
+                <div class="conditions-panel">
+                    <h3 class="panel-title">⚙️ ระบบตรวจสอบรางวัล (ชิ้นที่ 2)</h3>
+                    <div class="result-input-group">
+                        <input type="number" class="result-input" id="winningNumberInputB" placeholder="กรอกเลขที่ออก" min="0" max="99">
+                        <button class="btn-check" id="checkBtnB">ตรวจสอบผล</button>
+                    </div>
+                    <div class="result-message" id="resultMessageB">ผลการออกรางวัลสำหรับรางวัลชิ้นที่ 2</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // =================================================================
+        // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX2FAI7eFUfNLcJ9SI2eEdlPvPtcR4VqdcWWdCMqR-X6UQjQcT7mHiVvByxCtq6fQj1w/exec"; 
+        // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+        // =================================================================
+
+        // --- State Management for both grids ---
+        const state = {
+            A: {
+                selectedNumbers: new Set(),
+                assignments: new Map(),
+                isLoading: false,
+                elements: {
+                    grid: document.getElementById('numbersGridA'),
+                    list: document.getElementById('assignmentsListA'),
+                    input: document.getElementById('nameInputA'),
+                    assignBtn: document.getElementById('assignBtnA'),
+                    randomBtn: document.getElementById('randomBtnA'),
+                    exportBtn: document.getElementById('exportBtnA'),
+                    winInput: document.getElementById('winningNumberInputA'),
+                    checkBtn: document.getElementById('checkBtnA'),
+                    winMessage: document.getElementById('resultMessageA')
+                }
+            },
+            B: {
+                selectedNumbers: new Set(),
+                assignments: new Map(),
+                isLoading: false,
+                elements: {
+                    grid: document.getElementById('numbersGridB'),
+                    list: document.getElementById('assignmentsListB'),
+                    input: document.getElementById('nameInputB'),
+                    assignBtn: document.getElementById('assignBtnB'),
+                    randomBtn: document.getElementById('randomBtnB'),
+                    exportBtn: document.getElementById('exportBtnB'),
+                    winInput: document.getElementById('winningNumberInputB'),
+                    checkBtn: document.getElementById('checkBtnB'),
+                    winMessage: document.getElementById('resultMessageB')
+                }
+            }
+        };
+
+        // --- Reusable Functions ---
+        function renderNumberGrid(gridId) {
+            const { grid } = state[gridId].elements;
+            const { assignments, selectedNumbers } = state[gridId];
+            grid.innerHTML = '';
+            for (let i = 0; i <= 99; i++) {
+                const numberCard = document.createElement('div');
+                numberCard.className = 'number-card';
+                numberCard.textContent = i.toString().padStart(2, '0');
+                if (assignments.has(i)) {
+                    numberCard.classList.add('assigned');
+                } else {
+                    if (selectedNumbers.has(i)) numberCard.classList.add('selected');
+                    numberCard.onclick = () => toggleNumber(i, gridId);
+                }
+                grid.appendChild(numberCard);
+            }
+        }
+
+        function updateAssignmentsDisplay(gridId) {
+            const { list } = state[gridId].elements;
+            const { assignments } = state[gridId];
+            if (assignments.size === 0) {
+                list.innerHTML = '<span style="color: #9ca3af; font-style: italic;">กำลังโหลดหรือยังไม่มีการจอง...</span>';
+                return;
+            };
+            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0] - b[0]);
+            list.innerHTML = sorted.map(([num, name]) => `
+                <div class="assignment-item">
+                    <span class="assignment-number">${num.toString().padStart(2, '0')}</span>
+                    <span class="assignment-name">${name}</span>
+                </div>`).join('');
+        }
+
+        function updateUI(gridId) {
+            renderNumberGrid(gridId);
+            updateAssignmentsDisplay(gridId);
+        }
+
+        function toggleNumber(number, gridId) {
+            if (state[gridId].isLoading) return;
+            const { selectedNumbers } = state[gridId];
+            if (selectedNumbers.has(number)) {
+                selectedNumbers.delete(number);
+            } else {
+                selectedNumbers.add(number);
+            }
+            renderNumberGrid(gridId); // Re-render to show selection
+            updateAssignButton(gridId);
+        }
+
+        function updateAssignButton(gridId) {
+            const { input, assignBtn } = state[gridId].elements;
+            const { selectedNumbers, isLoading } = state[gridId];
+            assignBtn.disabled = !(selectedNumbers.size > 0 && input.value.trim().length > 0) || isLoading;
+        }
+
+        // --- Data Functions (API Calls) ---
+        async function loadData(gridId) {
+            if (state[gridId].isLoading) return;
+            state[gridId].isLoading = true;
+            updateAssignButton(gridId);
+            try {
+                const response = await fetch(`${SCRIPT_URL}?grid=${gridId}`);
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                const data = await response.json();
+                state[gridId].assignments = new Map(data);
+            } catch (error) {
+                console.error(`Failed to load data for Grid ${gridId}:`, error);
+                alert(`ไม่สามารถเชื่อมต่อฐานข้อมูลสำหรับตาราง ${gridId}`);
+            } finally {
+                state[gridId].isLoading = false;
+                updateUI(gridId);
+                updateAssignButton(gridId);
+            }
+        }
+
+        async function assignName(gridId) {
+            const { input, assignBtn } = state[gridId].elements;
+            const { selectedNumbers } = state[gridId];
+            const name = input.value.trim();
+            if (state[gridId].isLoading || !name || selectedNumbers.size === 0) return;
+
+            state[gridId].isLoading = true;
+            assignBtn.disabled = true;
+            assignBtn.textContent = "กำลังบันทึก...";
+            
+            const assignmentsToSend = Array.from(selectedNumbers).map(num => ({ number: num, name: name }));
+            const postData = { grid: gridId, assignments: assignmentsToSend };
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(postData));
+
+            try {
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                if (!response.ok) throw new Error(`Failed to save data: ${response.statusText}`);
+                const result = await response.json();
+                console.log(`Server response for Grid ${gridId}:`, result);
+                alert(`ส่งคำขอจองสำหรับตาราง ${gridId} แล้ว!`);
+            } catch (error) {
+                console.error(`Failed to save data for Grid ${gridId}:`, error);
+                alert(`เกิดข้อผิดพลาดในการจองข้อมูลสำหรับตาราง ${gridId}`);
+            }
+
+            selectedNumbers.clear();
+            input.value = '';
+            assignBtn.textContent = "📝 ยืนยันการจอง";
+            state[gridId].isLoading = false;
+            updateAssignButton(gridId);
+            setTimeout(() => loadData(gridId), 2000);
+        }
+
+        // --- Specific Actions ---
+        function randomSelect(gridId) {
+            if(state[gridId].isLoading) return;
+            const { assignments, selectedNumbers } = state[gridId];
+            const available = Array.from({length: 100}, (_, i) => i).filter(i => !assignments.has(i));
+            if (available.length === 0) return alert(`ทุกหมายเลขในตาราง ${gridId} ถูกจองแล้ว`);
+            const randomNum = available[Math.floor(Math.random() * available.length)];
+            selectedNumbers.clear();
+            selectedNumbers.add(randomNum);
+            renderNumberGrid(gridId);
+            updateAssignButton(gridId);
+        }
+
+        async function checkWinner(gridId) {
+            const { winInput, winMessage } = state[gridId].elements;
+            const { assignments } = state[gridId];
+            const numStr = winInput.value.trim();
+            if (!/^\d{1,2}$/.test(numStr)) {
+                winMessage.innerHTML = '<span style="color: red;">กรุณาใส่หมายเลข (0-99)</span>';
+                return;
+            }
+            const winNum = parseInt(numStr, 10);
+            await loadData(gridId);
+            if (!assignments.has(winNum)) {
+                winMessage.innerHTML = `หมายเลข <b>${winNum.toString().padStart(2,'0')}</b> ไม่มีผู้จอง`;
+            } else {
+                const winnerName = assignments.get(winNum);
+                winMessage.innerHTML = `ยินดีด้วย! ผู้โชคดีคือ <b>${winnerName}</b> (หมายเลข <b>${winNum.toString().padStart(2,'0')}</b>)`;
+            }
+        }
+        
+        function exportToExcel(gridId) {
+            const { assignments } = state[gridId];
+            if (assignments.size === 0) return alert(`ไม่มีข้อมูลในตาราง ${gridId} ให้ส่งออก`);
+            let csv = '\uFEFFหมายเลข,ชื่อ\n';
+            const sorted = Array.from(assignments.entries()).sort((a, b) => a[0] - b[0]);
+            sorted.forEach(([num, name]) => { csv += `${num.toString().padStart(2, '0')},"${name}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `lottery_assignments_grid_${gridId}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // --- Initialize ---
+        document.addEventListener('DOMContentLoaded', () => {
+            ['A', 'B'].forEach(gridId => {
+                const { elements } = state[gridId];
+                updateUI(gridId);
+                loadData(gridId);
+                
+                elements.input.addEventListener('input', () => updateAssignButton(gridId));
+                elements.assignBtn.addEventListener('click', () => assignName(gridId));
+                elements.randomBtn.addEventListener('click', () => randomSelect(gridId));
+                elements.exportBtn.addEventListener('click', () => exportToExcel(gridId));
+                elements.checkBtn.addEventListener('click', () => checkWinner(gridId));
+            });
+
+            setInterval(() => {
+                loadData('A');
+                loadData('B');
+            }, 20000); // Poll every 20 seconds
+        });
+    </script>
+</body>
+</html>
